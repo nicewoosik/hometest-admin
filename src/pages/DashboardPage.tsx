@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
-import { Users, Mail, Briefcase, FileText } from 'lucide-react'
+import { Mail, Briefcase, FileText } from 'lucide-react'
 
 export function DashboardPage() {
   // 통계 데이터 조회
