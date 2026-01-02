@@ -11,7 +11,7 @@ export function AccountList({ onEdit }: AccountListProps) {
   const queryClient = useQueryClient()
 
   // 계정 목록 조회
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading, error: queryError } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -19,7 +19,10 @@ export function AccountList({ onEdit }: AccountListProps) {
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        console.error('계정 목록 조회 오류:', error)
+        throw error
+      }
       return data as User[]
     },
   })
@@ -57,6 +60,25 @@ export function AccountList({ onEdit }: AccountListProps) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
         <div className="text-gray-600">로딩 중...</div>
+      </div>
+    )
+  }
+
+  if (queryError) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-8">
+        <div className="text-red-600 font-semibold mb-2">오류 발생</div>
+        <div className="text-sm text-gray-600 mb-4">
+          {queryError instanceof Error ? queryError.message : '계정 목록을 불러올 수 없습니다.'}
+        </div>
+        <div className="text-xs text-gray-500">
+          <details>
+            <summary className="cursor-pointer">상세 정보</summary>
+            <pre className="mt-2 p-2 bg-gray-100 rounded overflow-auto">
+              {JSON.stringify(queryError, null, 2)}
+            </pre>
+          </details>
+        </div>
       </div>
     )
   }
