@@ -51,3 +51,4 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... (anon 키)
 
 **주의**: service_role 키는 절대 입력하지 마세요!
 
+

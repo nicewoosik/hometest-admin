@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
-import { X, Mail, Building, Phone, FileText, Clock, CheckCircle, AlertCircle, Save } from 'lucide-react'
+import { X, Mail, Building, Phone, FileText, Clock, CheckCircle, AlertCircle } from 'lucide-react'
 import type { Inquiry } from '../../types'
 
 interface InquiryDetailProps {
@@ -209,4 +209,5 @@ export function InquiryDetail({ inquiry, onClose, onUpdate }: InquiryDetailProps
     </div>
   )
 }
+
 

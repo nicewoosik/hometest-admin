@@ -39,3 +39,4 @@ git push -u origin main
    - `VITE_SUPABASE_ANON_KEY`: Supabase Publishable key
 9. "Deploy" 클릭
 
+

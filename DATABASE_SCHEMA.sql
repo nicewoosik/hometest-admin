@@ -65,60 +65,127 @@ ALTER TABLE inquiries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_postings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_applications ENABLE ROW LEVEL SECURITY;
 
+-- 기존 정책 삭제 (있는 경우)
+DROP POLICY IF EXISTS "관리자는 모든 inquiries 조회 가능" ON inquiries;
+DROP POLICY IF EXISTS "관리자는 inquiries 수정 가능" ON inquiries;
+DROP POLICY IF EXISTS "관리자는 inquiries 삭제 가능" ON inquiries;
+DROP POLICY IF EXISTS "모든 사용자는 inquiries 생성 가능" ON inquiries;
+DROP POLICY IF EXISTS "anon_and_authenticated_can_insert_inquiries" ON inquiries;
+DROP POLICY IF EXISTS "관리자는 모든 job_postings 조회 가능" ON job_postings;
+DROP POLICY IF EXISTS "관리자는 job_postings 수정 가능" ON job_postings;
+DROP POLICY IF EXISTS "관리자는 job_postings 삭제 가능" ON job_postings;
+DROP POLICY IF EXISTS "모든 사용자는 job_postings 조회 가능" ON job_postings;
+DROP POLICY IF EXISTS "관리자는 모든 job_applications 조회 가능" ON job_applications;
+DROP POLICY IF EXISTS "관리자는 job_applications 수정 가능" ON job_applications;
+DROP POLICY IF EXISTS "관리자는 job_applications 삭제 가능" ON job_applications;
+DROP POLICY IF EXISTS "모든 사용자는 job_applications 생성 가능" ON job_applications;
+DROP POLICY IF EXISTS "anon_and_authenticated_can_insert_job_applications" ON job_applications;
+DROP POLICY IF EXISTS "관리자는 admin_users 조회 가능" ON admin_users;
+DROP POLICY IF EXISTS "관리자는 admin_users 수정 가능" ON admin_users;
+DROP POLICY IF EXISTS "관리자는 admin_users 삭제 가능" ON admin_users;
+
+-- 관리자 확인 함수 (admin_users 테이블에 존재하는지 확인)
+CREATE OR REPLACE FUNCTION is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM admin_users
+    WHERE auth_user_id = auth.uid()
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- RLS 정책: 관리자만 모든 데이터 접근 가능
--- (인증된 사용자만 접근 가능하도록 설정)
+-- inquiries 테이블 정책
 CREATE POLICY "관리자는 모든 inquiries 조회 가능"
   ON inquiries FOR SELECT
   TO authenticated
-  USING (true);
+  USING (is_admin());
 
 CREATE POLICY "관리자는 inquiries 수정 가능"
   ON inquiries FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (is_admin())
+  WITH CHECK (is_admin());
 
-CREATE POLICY "모든 사용자는 inquiries 생성 가능"
+CREATE POLICY "관리자는 inquiries 삭제 가능"
+  ON inquiries FOR DELETE
+  TO authenticated
+  USING (is_admin());
+
+CREATE POLICY "anon_and_authenticated_can_insert_inquiries"
   ON inquiries FOR INSERT
   TO authenticated, anon
   WITH CHECK (true);
 
+-- job_postings 테이블 정책
 CREATE POLICY "관리자는 모든 job_postings 조회 가능"
   ON job_postings FOR SELECT
   TO authenticated
-  USING (true);
+  USING (is_admin());
 
 CREATE POLICY "관리자는 job_postings 수정 가능"
-  ON job_postings FOR ALL
+  ON job_postings FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (is_admin())
+  WITH CHECK (is_admin());
 
-CREATE POLICY "모든 사용자는 job_postings 조회 가능"
+CREATE POLICY "관리자는 job_postings 삭제 가능"
+  ON job_postings FOR DELETE
+  TO authenticated
+  USING (is_admin());
+
+CREATE POLICY "관리자는 job_postings 생성 가능"
+  ON job_postings FOR INSERT
+  TO authenticated
+  WITH CHECK (is_admin());
+
+CREATE POLICY "모든 사용자는 job_postings 조회 가능 (공개)"
   ON job_postings FOR SELECT
   TO anon
   USING (true);
 
+-- job_applications 테이블 정책
 CREATE POLICY "관리자는 모든 job_applications 조회 가능"
   ON job_applications FOR SELECT
   TO authenticated
-  USING (true);
+  USING (is_admin());
 
 CREATE POLICY "관리자는 job_applications 수정 가능"
   ON job_applications FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (is_admin())
+  WITH CHECK (is_admin());
 
-CREATE POLICY "모든 사용자는 job_applications 생성 가능"
+CREATE POLICY "관리자는 job_applications 삭제 가능"
+  ON job_applications FOR DELETE
+  TO authenticated
+  USING (is_admin());
+
+CREATE POLICY "anon_and_authenticated_can_insert_job_applications"
   ON job_applications FOR INSERT
   TO authenticated, anon
   WITH CHECK (true);
 
+-- admin_users 테이블 정책
 CREATE POLICY "관리자는 admin_users 조회 가능"
   ON admin_users FOR SELECT
   TO authenticated
-  USING (true);
+  USING (is_admin());
 
 CREATE POLICY "관리자는 admin_users 수정 가능"
-  ON admin_users FOR ALL
+  ON admin_users FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (is_admin())
+  WITH CHECK (is_admin());
+
+CREATE POLICY "관리자는 admin_users 삭제 가능"
+  ON admin_users FOR DELETE
+  TO authenticated
+  USING (is_admin());
+
+CREATE POLICY "관리자는 admin_users 생성 가능"
+  ON admin_users FOR INSERT
+  TO authenticated
+  WITH CHECK (is_admin());
 

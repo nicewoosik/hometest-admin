@@ -44,3 +44,4 @@ export interface JobApplication {
   job_posting?: JobPosting
 }
 
+

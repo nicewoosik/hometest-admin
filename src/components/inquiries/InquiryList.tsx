@@ -25,7 +25,14 @@ export function InquiryList({ statusFilter, onSelectInquiry, selectedId }: Inqui
 
       const { data, error } = await query
 
-      if (error) throw error
+      if (error) {
+        console.error('RLS 에러:', error)
+        // RLS 정책 관련 에러인지 확인
+        if (error.message?.includes('row-level security') || error.code === '42501') {
+          throw new Error('접근 권한이 없습니다. 관리자 계정으로 로그인해주세요.')
+        }
+        throw error
+      }
       return data as Inquiry[]
     },
   })
@@ -143,4 +150,5 @@ export function InquiryList({ statusFilter, onSelectInquiry, selectedId }: Inqui
     </div>
   )
 }
+
 

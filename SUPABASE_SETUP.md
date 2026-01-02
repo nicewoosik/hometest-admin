@@ -118,3 +118,4 @@ INSERT INTO users (email, password_hash, name, role)
 VALUES ('admin@ecstel.co.kr', 'temp_hash', '관리자', 'admin');
 ```
 
+

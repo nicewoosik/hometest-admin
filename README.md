@@ -48,3 +48,4 @@ npm run dev
 - `SETUP_GUIDE.md` - Supabase 설정 가이드
 - `PROJECT_PLAN.md` - 프로젝트 전체 계획
 
+

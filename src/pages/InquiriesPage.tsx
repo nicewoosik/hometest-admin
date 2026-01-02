@@ -63,8 +63,7 @@ export function InquiriesPage() {
             inquiry={selectedInquiry}
             onClose={handleCloseDetail}
             onUpdate={() => {
-              // 목록 새로고침을 위해 상태 초기화 후 다시 선택
-              const id = selectedInquiry.id
+              // 목록 새로고침을 위해 상태 초기화
               setSelectedInquiry(null)
               setTimeout(() => {
                 // InquiryList에서 자동으로 새로고침됨
@@ -76,4 +75,5 @@ export function InquiriesPage() {
     </div>
   )
 }
+
 
