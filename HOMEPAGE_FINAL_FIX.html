@@ -1,0 +1,70 @@
+<!-- 홈페이지에 추가할 코드 -->
+<!-- 이 코드를 홈페이지의 <head> 태그 안에 추가하세요 -->
+
+<!-- Supabase 클라이언트 라이브러리 추가 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// Supabase 클라이언트 초기화
+const supabaseUrl = 'https://qzymoraaukwicqlhjbsy.supabase.co';
+const supabaseAnonKey = 'sb_publishable_9h5TGNNrnzpjvWCu_CYxVg_VuOC7XFr';
+
+const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+  },
+});
+
+// 기존 submitInquiry 함수를 완전히 교체
+async function submitInquiry(formData) {
+  console.log('문의 제출 시작:', formData);
+  
+  // 데이터 변환
+  const inquiryData = {
+    name: formData.wr_name || formData.get('name'),
+    company: formData.wr_subject || formData.get('company') || null,
+    email: formData.wr_email || formData.get('email'),
+    phone: formData.wr_2 || formData.get('phone') || null,
+    content: formData.wr_content || formData.get('content'),
+    status: 'new'
+  };
+
+  console.log('전송할 데이터:', inquiryData);
+
+  try {
+    // Supabase 클라이언트 사용 (RLS가 자동으로 처리됨)
+    const { data, error } = await supabase
+      .from('inquiries')
+      .insert([inquiryData])
+      .select();
+
+    if (error) {
+      console.error('Supabase 에러:', error);
+      throw new Error(error.message || '문의 접수 실패');
+    }
+
+    console.log('성공:', data);
+    return { success: true, data };
+  } catch (error) {
+    console.error('문의 접수 오류:', error);
+    throw error;
+  }
+}
+
+// 페이지 로드 시 기존 함수 오버라이드
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Supabase 클라이언트 초기화 완료');
+  
+  // 기존 submitInquiry 함수가 있다면 오버라이드
+  if (typeof window.originalSubmitInquiry === 'undefined') {
+    window.originalSubmitInquiry = window.submitInquiry;
+  }
+  
+  // 새로운 함수로 교체
+  window.submitInquiry = submitInquiry;
+  
+  console.log('submitInquiry 함수 교체 완료');
+});
+</script>
+
